@@ -1,6 +1,7 @@
 // Donate page — user picks an amount and donates to a specific org
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useAuth } from '@clerk/clerk-react'
 import { colors, font, radius, spacing } from '../styles/tokens'
 import Navbar from '../components/Navbar'
 import { causes } from '../data/causes.js'
@@ -10,16 +11,19 @@ import { people } from '../data/people.js'
 export default function Donate() {
     const { orgId } = useParams()
     const navigate = useNavigate()
+    const { getToken } = useAuth()
 
     // Find the org, its cause, and the person linked to that cause
     const org = orgs.find(o => o.id === parseInt(orgId))
     const cause = causes.find(c => c.id === org?.causeId)
     const person = people.find(p => p.causeId === org?.causeId)
 
-    // Donation
+    // Donation state
     const [amount, setAmount] = useState(null)
     const [custom, setCustom] = useState('')
     const [revealed, setRevealed] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
 
     // Redirect to browse if org not found
     if (!org) return navigate('/browse')
@@ -394,25 +398,65 @@ export default function Donate() {
                             }}
                         />
 
+                        {/* Error message */}
+                        {error && (
+                            <p style={{ color: colors.red, fontSize: font.size.sm, marginBottom: spacing.md, textAlign: 'center' }}>
+                                {error}
+                            </p>
+                        )}
+
                         {/* Confirm button */}
                         <button
-                            onClick={() => setRevealed(true)}
-                            disabled={!amount && !custom}
+                            onClick={async () => {
+                                const donationAmount = amount || custom
+                                if (!donationAmount) return
+
+                                setLoading(true)
+                                setError(null)
+
+                                try {
+                                    const token = await getToken({ template: 'charis' })
+                                    const response = await fetch('/api/donate', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            Authorization: `Bearer ${token}`,
+                                        },
+                                        body: JSON.stringify({
+                                            organizationID: org.mongoId,
+                                            amountXRP: donationAmount.toString(),
+                                        }),
+                                    })
+
+                                    const data = await response.json()
+
+                                    if (!response.ok) {
+                                        throw new Error(data.error || 'Donation failed')
+                                    }
+
+                                    setRevealed(true)
+                                } catch (err) {
+                                    setError(err.message || 'Something went wrong')
+                                } finally {
+                                    setLoading(false)
+                                }
+                            }}
+                            disabled={!amount && !custom || loading}
                             style={{
                                 width: '100%',
                                 padding: spacing.md,
                                 borderRadius: '999px',
                                 border: 'none',
-                                background: (amount || custom) ? colors.red : colors.redLight,
-                                color: (amount || custom) ? colors.bg : colors.redMid,
+                                background: (amount || custom) && !loading ? colors.red : colors.redLight,
+                                color: (amount || custom) && !loading ? colors.bg : colors.redMid,
                                 fontSize: font.size.base,
                                 fontWeight: font.weight.medium,
                                 fontFamily: font.family,
-                                cursor: (amount || custom) ? 'pointer' : 'not-allowed',
+                                cursor: (amount || custom) && !loading ? 'pointer' : 'not-allowed',
                                 transition: 'all 0.15s',
                             }}
                         >
-                        Confirm donation →
+                        {loading ? 'Processing...' : 'Confirm donation →'}
                         </button>
                     </div>
                 </div>
