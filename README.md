@@ -10,7 +10,7 @@ Built at a hackathon for the good of the community.
 
 ## 🖼️ Demo
 
-> Add screenshots or a live link here
+**Live demo:** https://blockchain-hack.vercel.app
 
 ---
 
