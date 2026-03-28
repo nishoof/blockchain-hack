@@ -13,6 +13,7 @@ export const orgs = [
   {
     id: 2,
     causeId: 1,
+    mongoId: "69c7e6e14486917a86d67ffd",
     name: "Fistula Foundation",
     description: "Funds the medical aid of children affected by the ongoing Congo civil war.",
     stat: "506 Kids",
@@ -22,6 +23,7 @@ export const orgs = [
   {
     id: 3,
     causeId: 1,
+    mongoId: "69c7e7024486917a86d67ffe",
     name: "AIDS Healthcare Foundation",
     description: "Provides support to those suffering from AIDS",
     stat: "345067 Individuals",
@@ -33,6 +35,7 @@ export const orgs = [
   {
     id: 4,
     causeId: 2,
+    mongoId: "69c7e71f4486917a86d67fff",
     name: "Shanti Bhavan Childrens Program",
     description: "Our mission is to garantee the education for every child in India.",
     stat: "3598 Children",
@@ -42,6 +45,7 @@ export const orgs = [
   {
     id: 5,
     causeId: 2,
+    mongoId: "69c7e7804486917a86d68000",
     name: "RAIN for the Sahek and Sahara",
     description: "We provide education in remote West African villages.",
     stat: "12 Schools built",
@@ -51,6 +55,7 @@ export const orgs = [
   {
     id: 6,
     causeId: 2,
+    mongoId: "69c7e79d4486917a86d68001",
     name: "National Education Association",
     description: "Worthwhile education must be accessible to all children.",
     stat: "20454 Tuitions",
@@ -62,6 +67,7 @@ export const orgs = [
   {
     id: 7,
     causeId: 3,
+    mongoId: "69c7e7c44486917a86d68002",
     name: "Yayasun Food Bank",
     description: "To provide nutritious meals to those in Malaysia's poorest areas.",
     stat: "43200 Meals",
@@ -71,6 +77,7 @@ export const orgs = [
   {
     id: 8,
     causeId: 3,
+    mongoId: "69c7e7e24486917a86d68003",
     name: "World Central Kitchen",
     description: "Make the world a better place one warm meal at a time.",
     stat: "1504890 Meals",
@@ -80,6 +87,7 @@ export const orgs = [
   {
     id: 9,
     causeId: 3,
+    mongoId: "69c7e8034486917a86d68004",
     name: "Feeding America",
     description: "Sharing meals and smiles across America.",
     stat: "25043 Families",
