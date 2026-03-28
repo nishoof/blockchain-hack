@@ -10,7 +10,7 @@ Built at a hackathon for the good of the community.
 
 ## 🖼️ Demo
 
-**Live demo:** https://blockchain-hack.vercel.app
+**Live demo:** https://charis-flax.vercel.app/
 
 ---
 
