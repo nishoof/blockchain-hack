@@ -157,9 +157,14 @@ export default function Transparency() {
                     {/* Middle — tx hash */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: colors.confirmed, flexShrink: 0 }} />
-                        <p style={{ fontSize: font.size.xs, color: colors.inkLight, fontFamily: 'monospace' }}>
-                        {tx.hash?.substring(0, 16) || 'N/A'}...
-                        </p>
+                        <a
+                            href={`https://testnet.xrpl.org/transactions/${tx.hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ fontSize: font.size.xs, color: colors.inkLight, fontFamily: 'monospace', textDecoration: 'none' }}
+                        >
+                            {tx.hash?.substring(0, 16) || 'N/A'}...
+                        </a>
                     </div>
 
                     {/* Right — amount */}
