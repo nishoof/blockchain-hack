@@ -41,3 +41,29 @@ func (r *OrganizationRepository) GetByID(ctx context.Context, id string) (*model
 	}
 	return &org, nil
 }
+
+func (r *OrganizationRepository) GetAll(ctx context.Context) ([]models.Organization, error) {
+	cursor, err := r.collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var orgs []models.Organization
+	if err := cursor.All(ctx, &orgs); err != nil {
+		return nil, err
+	}
+	return orgs, nil
+}
+
+func (r *OrganizationRepository) GetByXRPWalletAddress(ctx context.Context, address string) (*models.Organization, error) {
+	var org models.Organization
+	err := r.collection.FindOne(ctx, bson.M{"xrpWalletAddress": address}).Decode(&org)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &org, nil
+}

@@ -1,28 +1,38 @@
 // Transparency — public page showing all on-chain donations, no auth required
+import { useEffect, useState } from 'react'
 import { colors, font, radius, spacing } from '../styles/tokens'
 import Navbar from '../components/Navbar'
 import { causes } from '../data/causes.js'
 import { orgs } from '../data/orgs.js'
 
-const MOCK_TRANSACTIONS = [
-  { id: 1, orgId: 1, amount: 20, date: 'Mar 27, 2026', txHash: 'A1B2C3D4E5F6G7H8' },
-  { id: 2, orgId: 4, amount: 10, date: 'Mar 26, 2026', txHash: 'B2C3D4E5F6G7H8I9' },
-  { id: 3, orgId: 7, amount: 50, date: 'Mar 25, 2026', txHash: 'C3D4E5F6G7H8I9J0' },
-  { id: 4, orgId: 2, amount: 25, date: 'Mar 25, 2026', txHash: 'D4E5F6G7H8I9J0K1' },
-  { id: 5, orgId: 5, amount: 15, date: 'Mar 24, 2026', txHash: 'E5F6G7H8I9J0K1L2' },
-]
-
 export default function Transparency() {
-    // Filter transactions to current month only
+    const [transactions, setTransactions] = useState([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        fetch('/api/transparency')
+            .then(res => res.json())
+            .then(data => {
+                if (data.transactions) {
+                    setTransactions(data.transactions)
+                }
+                setLoading(false)
+            })
+            .catch(err => {
+                console.error('Failed to fetch transactions:', err)
+                setLoading(false)
+            })
+    }, [])
+
     const currentMonth = new Date().getMonth()
     const currentYear = new Date().getFullYear()
 
-    const monthlyTransactions = MOCK_TRANSACTIONS.filter(tx => {
-    const txDate = new Date(tx.date)
-    return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear
+    const monthlyTransactions = transactions.filter(tx => {
+        const txDate = new Date(tx.timestamp)
+        return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear
     })
 
-    const totalDonated = monthlyTransactions.reduce((sum, t) => sum + t.amount, 0)
+    const totalDonated = monthlyTransactions.reduce((sum, t) => sum + t.amountXRP, 0)
 
   return (
     <div style={{ fontFamily: font.family, background: colors.bg, minHeight: '100vh' }}>
@@ -96,69 +106,77 @@ export default function Transparency() {
             All transactions
         </p>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }}>
-            {MOCK_TRANSACTIONS.map(tx => {
-            const org = orgs.find(o => o.id === tx.orgId)
-            const cause = causes.find(c => c.id === org?.causeId)
+        {loading ? (
+            <p style={{ textAlign: 'center', color: colors.inkLight }}>Loading transactions...</p>
+        ) : transactions.length === 0 ? (
+            <p style={{ textAlign: 'center', color: colors.inkLight }}>No transactions yet. Be the first to donate!</p>
+        ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }}>
+            {transactions.map((tx, idx) => {
+                const org = orgs.find(o => o.mongoId === tx.organizationID)
+                const cause = causes.find(c => c.id === org?.causeId)
+                const displayName = tx.organizationName || org?.name || 'Unknown Organization'
+                const displayDate = tx.timestamp ? new Date(tx.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown Date'
 
-            return (
-                <div key={tx.id} style={{
-                background: colors.white,
-                border: `0.5px solid ${colors.redMid}`,
-                borderRadius: radius.lg,
-                padding: spacing.lg,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: spacing.lg,
-                }}>
-
-                {/* Left — org info */}
-                <div style={{ flex: 1 }}>
-                    <div style={{
-                    display: 'inline-flex',
+                return (
+                    <div key={tx.hash || idx} style={{
+                    background: colors.white,
+                    border: `0.5px solid ${colors.redMid}`,
+                    borderRadius: radius.lg,
+                    padding: spacing.lg,
+                    display: 'flex',
                     alignItems: 'center',
-                    gap: '4px',
-                    background: colors.redLight,
-                    color: colors.red,
-                    fontSize: font.size.xs,
-                    fontWeight: font.weight.medium,
-                    padding: '3px 8px',
-                    borderRadius: '999px',
-                    marginBottom: spacing.sm,
+                    justifyContent: 'space-between',
+                    gap: spacing.lg,
                     }}>
-                    <img src={cause?.icon} alt={cause?.name} style={{ width: '12px', height: '12px', objectFit: 'contain' }} /> {cause?.name}
+
+                    {/* Left — org info */}
+                    <div style={{ flex: 1 }}>
+                        <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        background: colors.redLight,
+                        color: colors.red,
+                        fontSize: font.size.xs,
+                        fontWeight: font.weight.medium,
+                        padding: '3px 8px',
+                        borderRadius: '999px',
+                        marginBottom: spacing.sm,
+                        }}>
+                        {cause && <img src={cause.icon} alt={cause.name} style={{ width: '12px', height: '12px', objectFit: 'contain' }} />} {cause?.name || 'Donation'}
+                        </div>
+                        <p style={{ fontSize: font.size.base, fontWeight: font.weight.medium, color: colors.inkDark, marginBottom: '2px' }}>
+                        {displayName}
+                        </p>
+                        <p style={{ fontSize: font.size.xs, color: colors.inkLight, fontWeight: font.weight.light }}>
+                        {displayDate}
+                        </p>
                     </div>
-                    <p style={{ fontSize: font.size.base, fontWeight: font.weight.medium, color: colors.inkDark, marginBottom: '2px' }}>
-                    {org?.name}
-                    </p>
-                    <p style={{ fontSize: font.size.xs, color: colors.inkLight, fontWeight: font.weight.light }}>
-                    {tx.date}
-                    </p>
-                </div>
 
-                {/* Middle — tx hash */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
-                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: colors.confirmed, flexShrink: 0 }} />
-                    <p style={{ fontSize: font.size.xs, color: colors.inkLight, fontFamily: 'monospace' }}>
-                    {tx.txHash}
+                    {/* Middle — tx hash */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
+                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: colors.confirmed, flexShrink: 0 }} />
+                        <p style={{ fontSize: font.size.xs, color: colors.inkLight, fontFamily: 'monospace' }}>
+                        {tx.hash?.substring(0, 16) || 'N/A'}...
+                        </p>
+                    </div>
+
+                    {/* Right — amount */}
+                    <p style={{
+                        fontSize: font.size.md,
+                        fontWeight: font.weight.medium,
+                        color: colors.red,
+                        flexShrink: 0,
+                    }}>
+                        ${tx.amountXRP?.toFixed(2) || '0.00'}
                     </p>
-                </div>
 
-                {/* Right — amount */}
-                <p style={{
-                    fontSize: font.size.md,
-                    fontWeight: font.weight.medium,
-                    color: colors.red,
-                    flexShrink: 0,
-                }}>
-                    ${tx.amount}
-                </p>
-
-                </div>
-            )
+                    </div>
+                )
             })}
-        </div>
+            </div>
+        )}
         </div>
     </div>
   )
