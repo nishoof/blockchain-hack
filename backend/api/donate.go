@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/nishoof/blockchain-hack/backend/auth"
 	"github.com/nishoof/blockchain-hack/backend/db"
 	"github.com/nishoof/blockchain-hack/backend/xrp"
 )
@@ -18,7 +19,20 @@ func DonateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	donorEmail, organizationID, amount, err := parseAndValidateDonateRequest(r)
+	claims, err := auth.ValidateAuth(r)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	customClaims, ok := claims.Custom.(*auth.CustomClaims)
+	if !ok {
+		http.Error(w, "Invalid custom claims", http.StatusUnauthorized)
+		return
+	}
+	donorEmail := customClaims.Email
+
+	organizationID, amount, err := parseAndValidateDonateRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -80,39 +94,32 @@ func DonateHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func parseAndValidateDonateRequest(r *http.Request) (string, string, float64, error) {
+func parseAndValidateDonateRequest(r *http.Request) (string, float64, error) {
 	var req struct {
-		DonorEmail     string `json:"donorEmail"`
 		OrganizationID string `json:"organizationID"`
 		AmountXRP      string `json:"amountXRP"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return "", "", 0, fmt.Errorf("Invalid request body")
+		return "", 0, fmt.Errorf("Invalid request body")
 	}
 
-	if req.DonorEmail == "" {
-		return "", "", 0, fmt.Errorf("Donor email is required")
-	}
 	if req.OrganizationID == "" {
-		return "", "", 0, fmt.Errorf("Organization ID is required")
+		return "", 0, fmt.Errorf("Organization ID is required")
 	}
 	if req.AmountXRP == "" {
-		return "", "", 0, fmt.Errorf("Amount is required")
+		return "", 0, fmt.Errorf("Amount is required")
 	}
 
 	amount, err := strconv.ParseFloat(req.AmountXRP, 64)
 	if err != nil || amount <= 0 {
-		return "", "", 0, fmt.Errorf("Invalid amount")
+		return "", 0, fmt.Errorf("Invalid amount")
 	}
-	return req.DonorEmail, req.OrganizationID, amount, nil
+	return req.OrganizationID, amount, nil
 }
 
 func getUserBalanceAndCheckSufficient(ctx context.Context, userRepo *db.UserRepository, email string, amount float64) (float64, error, int) {
-	fmt.Println("email:", email)
-
 	balanceStr, err := userRepo.GetBalanceByEmail(ctx, email)
 	if err != nil {
-		fmt.Println(err)
 		return 0, fmt.Errorf("Failed to get balance"), http.StatusInternalServerError
 	}
 	if balanceStr == "" {
