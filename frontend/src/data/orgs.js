@@ -1,0 +1,88 @@
+export const orgs = [
+  // --- CAUSE 1 ORGS ---
+  {
+    id: 1,
+    causeId: 1,
+    name: "California Helath Care Foundation",
+    description: "Aids uninsured patients get the treatment they deserve.",
+    stat: "1349 Patients",
+    goal: 500000,
+    raised: 278943,
+  },
+  {
+    id: 2,
+    causeId: 1,
+    name: "Fistula Foundation",
+    description: "Funds the medical aid of children affected by the ongoing Congo civil war.",
+    stat: "506 Kids",
+    goal: 35000,
+    raised: 24071,
+  },
+  {
+    id: 3,
+    causeId: 1,
+    name: "AIDS Healthcare Foundation",
+    description: "Provides support to those suffering from AIDS",
+    stat: "345067 Individuals",
+    goal: 1200000,
+    raised: 670045,
+  },
+
+  // --- CAUSE 2 ORGS ---
+  {
+    id: 4,
+    causeId: 2,
+    name: "Shanti Bhavan Childrens Program",
+    description: "Our mission is to garantee the education for every child in India.",
+    stat: "3598 Children",
+    goal: 25000,
+    raised: 23005,
+  },
+  {
+    id: 5,
+    causeId: 2,
+    name: "RAIN for the Sahek and Sahara",
+    description: "We provide education in remote West African villages.",
+    stat: "12 Schools built",
+    goal: 300000,
+    raised: 106450,
+  },
+  {
+    id: 6,
+    causeId: 2,
+    name: "National Education Association",
+    description: "Worthwhile education must be accessible to all children.",
+    stat: "20454 Tuitions",
+    goal: 500000,
+    raised: 405609,
+  },
+
+  // --- CAUSE 3 ORGS ---
+  {
+    id: 7,
+    causeId: 3,
+    name: "Yayasun Food Bank",
+    description: "To provide nutritious meals to those in Malayas poorest areas.",
+    stat: "43200 Meals",
+    goal: 50000,
+    raised: 34000,
+  },
+  {
+    id: 8,
+    causeId: 3,
+    name: "World Central Kitchen",
+    description: "Make the world a better place one warm meal at a time.",
+    stat: "1504890 Meals",
+    goal: 0,
+    raised: 0,
+  },
+  {
+    id: 9,
+    causeId: 3,
+    name: "Feeding America",
+    description: "Sharing meals and smiles across America.",
+    stat: "25043 Families,
+    goal: 50000,
+    raised: 34070,
+  },
+]
