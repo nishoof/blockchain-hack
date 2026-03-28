@@ -1,45 +1,38 @@
-// ENGINEER: Fill out 3 beneficiary stories — one per cause
-// causeId matches the cause id from causes.js
-// quote must be max 15 words, emotional but not overdramatic
-// covered = 2-3 short strings showing what the donation paid for
-
 export const people = [
-  // --- CAUSE 1 PERSON ---
+  // --- CAUSE 1: Medical Aid ---
   {
     id: 1,
     causeId: 1,
-    name: "", // e.g. "Maria T."
-    age: 0, // e.g. 34
-    location: "", // e.g. "San Francisco, CA"
-    situation: "", // one sentence: how they got here
-    outcome: "", // one sentence: what the donation did
-    quote: "", // max 15 words, their voice
-    covered: ["", "", ""], // e.g. ["4 days of groceries", "Fresh produce", "Kids snacks"]
+    name: "Liam Smith",
+    age: 34,
+    location: "Los Angeles, CA",
+    situation: "A workplace accident left Liam with a fractured shoulder blade, requiring surgery and months of rehabilitation.",
+    outcome: "Full coverage of surgery costs and post-operative rehabilitation.",
+    quote: "I didn't know how I was going to afford this and still keep the lights on. This means everything to my family.",
+    covered: ["Consultation", "Imaging & X-rays", "Surgery", "Hospital Fees", "Anesthesia", "Post-op Rehabilitation"],
   },
-
-  // --- CAUSE 2 PERSON ---
+  // --- CAUSE 2: Education ---
   {
     id: 2,
     causeId: 2,
-    name: "",
-    age: 0,
-    location: "",
-    situation: "",
-    outcome: "",
-    quote: "",
-    covered: ["", "", ""],
+    name: "Tarun Sethulingam",
+    age: 19,
+    location: "Santa Clara University, CA",
+    situation: "An international student on a tight budget, Tarun struggles to afford a full semester of insulin needed to manage his diabetes.",
+    outcome: "Coverage for a full semester's worth of insulin.",
+    quote: "I came here to build a future. I'm so grateful I don't have to choose between my health and my education.",
+    covered: ["Insulin (September)", "Insulin (October)", "Insulin (November)", "Insulin (December)"],
   },
-
-  // --- CAUSE 3 PERSON ---
+  // --- CAUSE 3: Hunger Relief ---
   {
     id: 3,
     causeId: 3,
-    name: "",
-    age: 0,
-    location: "",
-    situation: "",
-    outcome: "",
-    quote: "",
-    covered: ["", "", ""],
+    name: "Emily Carter",
+    age: 42,
+    location: "Sacramento, CA",
+    situation: "A single mother of three working multiple jobs, Emily often skips meals to make sure her children are fed.",
+    outcome: "Two months of groceries and meal support for Emily and her kids.",
+    quote: "My kids went to bed with full stomachs last night. I haven't been able to say that in months. Thank you.",
+    covered: ["Groceries (Week 1)", "Groceries (Week 2)", "Groceries (Week 3)", "Groceries (Week 4)"],
   },
 ]
