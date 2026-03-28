@@ -1,14 +1,12 @@
 // Dashboard — personal impact page
-import { useState, useEffect } from 'react'
+import { useAuth, UserProfile, useUser } from '@clerk/clerk-react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useUser } from '@clerk/clerk-react'
-import { colors, font, radius, spacing } from '../styles/tokens'
 import Navbar from '../components/Navbar'
 import { causes } from '../data/causes.js'
 import { orgs } from '../data/orgs.js'
 import { people } from '../data/people.js'
-import { UserProfile } from '@clerk/clerk-react'
-import { useAuth } from '@clerk/clerk-react'
+import { colors, font, radius, spacing } from '../styles/tokens'
 
 // Mock donation history — replace with real API call later
 const MOCK_DONATIONS = [
@@ -30,15 +28,14 @@ export default function Dashboard() {
 
     // Fetch user balance from backend on load
     useEffect(() => {
-        if (!user?.primaryEmailAddress?.emailAddress) return
-        getToken().then(token => {
-            fetch(`/api/user?email=${user.primaryEmailAddress.emailAddress}`, {
-            headers: { Authorization: `Bearer ${token}` }
+        getToken({ template: 'charis' }).then(token => {
+            fetch('/api/user', {
+                headers: { Authorization: `Bearer ${token}` }
             })
-            .then(r => r.json())
-            .then(data => setBalance(parseFloat(data.balanceXRP) * XRP_RATE))
+                .then(r => r.json())
+                .then(data => setBalance(parseFloat(data.balanceXRP) * XRP_RATE))
         })
-    }, [user])
+    }, [getToken])
 
     // Derive user info from Clerk
     const name = user?.firstName ?? '...'

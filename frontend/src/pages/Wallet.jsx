@@ -1,9 +1,8 @@
 // Wallet — top up balance, view transaction history
-import { useState, useEffect } from 'react'
-import { useUser } from '@clerk/clerk-react'
-import { colors, font, radius, spacing } from '../styles/tokens'
+import { useAuth, useUser } from '@clerk/clerk-react'
+import { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
-import { useAuth } from '@clerk/clerk-react'
+import { colors, font, radius, spacing } from '../styles/tokens'
 
 const XRP_RATE = 1.5
 
@@ -28,15 +27,14 @@ export default function Wallet() {
   const [confirmed, setConfirmed] = useState(false)
 
   useEffect(() => {
-  if (!user?.primaryEmailAddress?.emailAddress) return
-  getToken().then(token => {
-    fetch(`/api/user?email=${user.primaryEmailAddress.emailAddress}`, {
-      headers: { Authorization: `Bearer ${token}` }
+    getToken({ template: 'charis' }).then(token => {
+      fetch('/api/user', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(r => r.json())
+        .then(data => setBalance(parseFloat(data.balanceXRP) * XRP_RATE))
     })
-      .then(r => r.json())
-      .then(data => setBalance(parseFloat(data.balanceXRP) * XRP_RATE))
-  })
-  }, [user])
+  }, [getToken])
 
   const xrpBalance = balance != null ? (balance / XRP_RATE).toFixed(2) : '...'
   const finalAmount = amount ?? (custom ? parseFloat(custom) : null)

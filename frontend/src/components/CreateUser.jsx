@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
 import { useAuth, useUser } from '@clerk/clerk-react'
+import { useEffect } from 'react'
 
 export default function CreateUser() {
   const { isSignedIn, getToken } = useAuth()
@@ -7,7 +7,7 @@ export default function CreateUser() {
 
   useEffect(() => {
     if (!isSignedIn || !user?.primaryEmailAddress?.emailAddress) return
-    getToken().then(token => {
+    getToken({ template: 'charis' }).then(token => {
       fetch('/api/user', {
         method: 'POST',
         headers: {

@@ -1,11 +1,9 @@
 // Navbar - sits below the announcement bar on every page
-import { useState, useEffect } from 'react'
+import { SignedIn, SignedOut, SignInButton, useAuth, useUser } from '@clerk/clerk-react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useUser } from '@clerk/clerk-react'
-import { colors, font, spacing } from '../styles/tokens'
 import logo from '../assets/logo.png'
-import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react'
-import { useAuth } from '@clerk/clerk-react'
+import { colors, font, spacing } from '../styles/tokens'
 
 const XRP_RATE = 1.5
 
@@ -14,16 +12,15 @@ export default function Navbar() {
   const { getToken } = useAuth()
   const [balance, setBalance] = useState(null)
 
-    useEffect(() => {
-    if (!user?.primaryEmailAddress?.emailAddress) return
-    getToken().then(token => {
-        fetch(`/api/user?email=${user.primaryEmailAddress.emailAddress}`, {
+  useEffect(() => {
+    getToken({ template: 'charis' }).then(token => {
+      fetch('/api/user', {
         headers: { Authorization: `Bearer ${token}` }
-        })
+      })
         .then(r => r.json())
         .then(data => setBalance(parseFloat(data.balanceXRP) * XRP_RATE))
     })
-    }, [user])
+  }, [getToken])
 
   const xrpBalance = balance != null ? (balance / XRP_RATE).toFixed(2) : '...'
 

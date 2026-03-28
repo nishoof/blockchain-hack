@@ -3,8 +3,10 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
+	"github.com/nishoof/blockchain-hack/backend/auth"
 	"github.com/nishoof/blockchain-hack/backend/db"
 )
 
@@ -55,11 +57,19 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func getBalance(w http.ResponseWriter, r *http.Request) {
-	email := r.URL.Query().Get("email")
-	if email == "" {
-		http.Error(w, "Email query parameter is required", http.StatusBadRequest)
+	claims, err := auth.ValidateAuth(r)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		fmt.Println("GET User Balance Auth validation error:", err)
 		return
 	}
+
+	customClaims, ok := claims.Custom.(*auth.CustomClaims)
+	if !ok {
+		http.Error(w, "Invalid custom claims", http.StatusUnauthorized)
+		return
+	}
+	email := customClaims.Email
 
 	userRepo, err := db.NewUserRepository()
 	if err != nil {
