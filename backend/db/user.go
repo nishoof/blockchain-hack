@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/nishoof/blockchain-hack/backend/models"
 
@@ -41,10 +42,10 @@ func ensureUniqueIndexOnEmail(collection *mongo.Collection) error {
 	return err
 }
 
-func (r *UserRepository) Create(ctx context.Context, email string, balanceUSD string) error {
+func (r *UserRepository) Create(ctx context.Context, email string, balanceXRP string) error {
 	user := models.User{
 		Email:      email,
-		BalanceUSD: balanceUSD,
+		BalanceXRP: balanceXRP,
 	}
 	_, err := r.collection.InsertOne(ctx, user)
 	if err != nil {
@@ -70,14 +71,54 @@ func (r *UserRepository) GetBalanceByEmail(ctx context.Context, email string) (s
 		}
 		return "", err
 	}
-	return user.BalanceUSD, nil
+	return user.BalanceXRP, nil
 }
 
-func (r *UserRepository) UpdateBalanceByEmail(ctx context.Context, email string, balanceUSD string) error {
+func (r *UserRepository) UpdateBalanceByEmail(ctx context.Context, email string, balanceXRP string) error {
 	_, err := r.collection.UpdateOne(
 		ctx,
 		bson.M{"email": email},
-		bson.M{"$set": bson.M{"balanceUSD": balanceUSD}},
+		bson.M{"$set": bson.M{"balanceXRP": balanceXRP}},
 	)
 	return err
+}
+
+func (r *UserRepository) DeductBalanceIfSufficient(ctx context.Context, email string, amountXRP float64) (string, error) {
+	currentBalanceStr, err := r.GetBalanceByEmail(ctx, email)
+	if err != nil {
+		return "", err
+	}
+	if currentBalanceStr == "" {
+		return "", errors.New("user not found")
+	}
+
+	currentBalance, err := strconv.ParseFloat(currentBalanceStr, 64)
+	if err != nil {
+		return "", errors.New("invalid balance")
+	}
+
+	if currentBalance < amountXRP {
+		return "", errors.New("insufficient balance")
+	}
+
+	newBalance := currentBalance - amountXRP
+	newBalanceStr := fmt.Sprintf("%.6f", newBalance)
+
+	filter := bson.M{
+		"email":      email,
+		"balanceXRP": currentBalanceStr,
+	}
+	update := bson.M{
+		"$set": bson.M{"balanceXRP": newBalanceStr},
+	}
+
+	result := r.collection.FindOneAndUpdate(ctx, filter, update)
+	if result.Err() != nil {
+		if errors.Is(result.Err(), mongo.ErrNoDocuments) {
+			return "", errors.New("insufficient balance")
+		}
+		return "", result.Err()
+	}
+
+	return newBalanceStr, nil
 }
