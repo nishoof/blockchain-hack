@@ -41,10 +41,10 @@ func ensureUniqueIndexOnEmail(collection *mongo.Collection) error {
 	return err
 }
 
-func (r *UserRepository) Create(ctx context.Context, email string, balanceUSD string) error {
+func (r *UserRepository) Create(ctx context.Context, email string, balanceXRP string) error {
 	user := models.User{
 		Email:      email,
-		BalanceUSD: balanceUSD,
+		BalanceXRP: balanceXRP,
 	}
 	_, err := r.collection.InsertOne(ctx, user)
 	if err != nil {
@@ -70,14 +70,14 @@ func (r *UserRepository) GetBalanceByEmail(ctx context.Context, email string) (s
 		}
 		return "", err
 	}
-	return user.BalanceUSD, nil
+	return user.BalanceXRP, nil
 }
 
-func (r *UserRepository) UpdateBalanceByEmail(ctx context.Context, email string, balanceUSD string) error {
+func (r *UserRepository) UpdateBalanceByEmail(ctx context.Context, email string, balanceXRP string) error {
 	_, err := r.collection.UpdateOne(
 		ctx,
 		bson.M{"email": email},
-		bson.M{"$set": bson.M{"balanceUSD": balanceUSD}},
+		bson.M{"$set": bson.M{"balanceXRP": balanceXRP}},
 	)
 	return err
 }

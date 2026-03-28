@@ -39,7 +39,9 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return
 	}
-	if err := userRepo.Create(r.Context(), req.Email, "100"); err != nil {
+
+	const initialBalanceXRP = "100" // 100 XRP (150 USD) for new users
+	if err := userRepo.Create(r.Context(), req.Email, initialBalanceXRP); err != nil {
 		if errors.Is(err, db.ErrUserAlreadyExists) {
 			http.Error(w, "User already exists", http.StatusConflict)
 			return
@@ -75,5 +77,5 @@ func getBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]string{"email": email, "balanceUSD": balance})
+	json.NewEncoder(w).Encode(map[string]string{"email": email, "balanceXRP": balance})
 }
